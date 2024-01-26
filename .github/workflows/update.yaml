@@ -1,0 +1,32 @@
+name: Build and Deploy to BunnyCDN
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+
+    - name: Deploy to BunnyCDN
+      uses: ayeressian/bunnycdn-storage-deploy@v2.2.0
+      with:
+        source: "" # Change this to the build output directory
+        destination: ""
+        storageZoneName: "${{ secrets.STORAGE_NAME }}"
+        storagePassword: "${{ secrets.STORAGE_PASSWORD }}"
+        accessKey: "${{ secrets.STORAGE_KEY }}"
+        pullZoneId: 1888334
+        upload: "true"
+        remove: "false"
+        purgePullZone: "false"
+    - name: Debug Purge
+      run: |
+        response=$(curl -X POST -H "AccessKey: ${{ secrets.STORAGE_KEY }}" https://api.bunny.net/purge?url=https://goodstobkal.com )
+        echo "Purge Response: $response"
